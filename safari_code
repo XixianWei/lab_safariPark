@@ -1,0 +1,53 @@
+--The names of the animals in a given enclosure
+SELECT name FROM animals WHERE enclosure_id = 1;
+
+
+--The names of the staff working in a given enclosure
+SELECT employees.name AS employee_name
+FROM employees
+LEFT JOIN assignments ON employees.id = assignments.employeeId
+LEFT JOIN enclosures ON assignments.enclosureId = enclosures.id
+WHERE enclosures.name = 'Big cat field'
+;
+
+-- The names of staff working in enclosures which are closed for maintenance
+SELECT employees.name AS employee_name
+FROM employees
+INNER JOIN assignments 
+ON employees.id = assignments.employeeId
+INNER JOIN enclosures 
+ON assignments.enclosureId = enclosures.id
+WHERE enclosures.closedForMaintenance = true
+;
+
+-- The name of the enclosure where the oldest animal lives. If there are two animals who are the same age choose the first one alphabetically.
+SELECT enclosures.name, animals.name, animals.age 
+FROM enclosures
+INNER JOIN animals
+ON enclosures.id = animals.enclosure_id
+ORDER BY animals.age DESC LIMIT 1
+;
+
+-- The number of different animal types a given keeper has been assigned to work with.
+SELECT COUNT(DISTINCT animals.type),employees.name
+FROM assignments
+INNER JOIN employees ON employees.id = assignments.employeeId 
+INNER JOIN animals ON assignments.enclosureId = animals.enclosure_id
+GROUP BY employees.name
+;
+
+-- The number of different keepers who have been assigned to work in a given enclosure
+SELECT COUNT(DISTINCT employees.name), enclosures.name, employees.name
+FROM assignments
+INNER JOIN enclosures ON enclosures.id = assignments.enclosureId 
+INNER JOIN employees ON employees.id = assignments.employeeId
+GROUP BY enclosures.name, employees.name
+;
+
+--The names of the other animals sharing an enclosure with a given animal (eg. find the names of all the animals sharing the big cat field with Tony)
+SELECT DISTINCT animals.name 
+FROM animals
+INNER JOIN enclosures
+ON enclosure.id = animals.enclosure_id
+WHERE NOT animals.name = 'Tony' AND enclosures.name = 'Big cat field';
+
